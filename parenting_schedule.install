@@ -1,0 +1,117 @@
+<?php
+
+/**
+ * Implements hook_schema().
+ */
+function parenting_schedule_schema() {
+  $schema['parenting_schedule_months'] = [
+    'description' => 'Months configured to display on the parenting schedule calendar.',
+    'fields' => [
+      'id' => ['type' => 'serial', 'not null' => TRUE, 'unsigned' => TRUE],
+      'year' => ['type' => 'int', 'not null' => TRUE],
+      'month' => ['type' => 'int', 'not null' => TRUE, 'description' => '1-12'],
+    ],
+    'primary key' => ['id'],
+    'unique keys' => [
+      'year_month' => ['year', 'month'],
+    ],
+  ];
+
+  $schema['parenting_schedule_days'] = [
+    'description' => 'Per-day exchange/parenting assignments for the calendar.',
+    'fields' => [
+      'id' => ['type' => 'serial', 'not null' => TRUE, 'unsigned' => TRUE],
+      'day_date' => ['type' => 'varchar', 'length' => 10, 'not null' => TRUE, 'description' => 'YYYY-MM-DD'],
+      'day_type' => ['type' => 'varchar', 'length' => 20, 'not null' => TRUE, 'description' => 'exchange|parenting'],
+      'exchange_time' => ['type' => 'varchar', 'length' => 5, 'null' => TRUE, 'description' => 'HH:MM'],
+      'exchange_type' => ['type' => 'varchar', 'length' => 20, 'null' => TRUE, 'description' => 'eric_to_sarah|sarah_to_eric'],
+      'parent' => ['type' => 'varchar', 'length' => 10, 'null' => TRUE, 'description' => 'eric|sarah'],
+      'label' => ['type' => 'varchar', 'length' => 100, 'null' => TRUE],
+      'occasion' => ['type' => 'varchar', 'length' => 100, 'null' => TRUE, 'description' => 'Free-text type of day, e.g. Christmas Day, PA Day.'],
+    ],
+    'primary key' => ['id'],
+    'unique keys' => [
+      'day_date' => ['day_date'],
+    ],
+  ];
+
+  return $schema;
+}
+
+/**
+ * Implements hook_install().
+ */
+function parenting_schedule_install() {
+  $database = \Drupal::database();
+  $months = [
+    [2026, 9], [2026, 10], [2026, 11], [2026, 12],
+    [2027, 1], [2027, 2], [2027, 3],
+  ];
+  foreach ($months as [$year, $month]) {
+    $database->merge('parenting_schedule_months')
+      ->keys(['year' => $year, 'month' => $month])
+      ->execute();
+  }
+}
+
+/**
+ * Replace the legacy date-range blocks/overrides schema with the per-day
+ * months/days model (Exchange Day vs Parenting Day entries).
+ */
+function parenting_schedule_update_8001(&$sandbox) {
+  $schema = \Drupal::database()->schema();
+
+  if ($schema->tableExists('parenting_blocks')) {
+    $schema->dropTable('parenting_blocks');
+  }
+  if ($schema->tableExists('exchange_overrides')) {
+    $schema->dropTable('exchange_overrides');
+  }
+
+  $full_schema = parenting_schedule_schema();
+
+  if (!$schema->tableExists('parenting_schedule_months')) {
+    $schema->createTable('parenting_schedule_months', $full_schema['parenting_schedule_months']);
+  }
+  if (!$schema->tableExists('parenting_schedule_days')) {
+    $schema->createTable('parenting_schedule_days', $full_schema['parenting_schedule_days']);
+  }
+
+  $database = \Drupal::database();
+  $count = $database->select('parenting_schedule_months', 'm')
+    ->countQuery()
+    ->execute()
+    ->fetchField();
+
+  if ($count == 0) {
+    $months = [
+      [2026, 9], [2026, 10], [2026, 11], [2026, 12],
+      [2027, 1], [2027, 2], [2027, 3],
+    ];
+    foreach ($months as [$year, $month]) {
+      $database->merge('parenting_schedule_months')
+        ->keys(['year' => $year, 'month' => $month])
+        ->execute();
+    }
+  }
+
+  return t('Parenting schedule schema updated to the per-day months/days model.');
+}
+
+/**
+ * Add the "occasion" (Type of Day) column to parenting_schedule_days.
+ */
+function parenting_schedule_update_8002(&$sandbox) {
+  $schema = \Drupal::database()->schema();
+
+  if (!$schema->fieldExists('parenting_schedule_days', 'occasion')) {
+    $schema->addField('parenting_schedule_days', 'occasion', [
+      'type' => 'varchar',
+      'length' => 100,
+      'null' => TRUE,
+      'description' => 'Free-text type of day, e.g. Christmas Day, PA Day.',
+    ]);
+  }
+
+  return t('Added the occasion (Type of Day) column.');
+}

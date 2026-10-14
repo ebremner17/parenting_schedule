@@ -1,0 +1,7 @@
+access parenting schedule:
+  title: 'Access Parenting Schedule'
+  description: 'View the parenting schedule calendar and hours breakdown.'
+
+administer parenting schedule:
+  title: 'Administer Parenting Schedule'
+  description: 'Edit shift blocks, hunting periods, and exchange time overrides.'

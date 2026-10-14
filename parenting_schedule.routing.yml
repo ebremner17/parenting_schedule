@@ -1,0 +1,71 @@
+parenting_schedule.frontend:
+  path: '/schedule'
+  defaults:
+    _controller: '\Drupal\parenting_schedule\Controller\ScheduleController::frontend'
+    _title: 'Parenting Schedule & Analysis'
+  requirements:
+    _permission: 'access parenting schedule'
+
+parenting_schedule.admin:
+  path: '/admin/config/parenting-schedule'
+  defaults:
+    _controller: '\Drupal\parenting_schedule\Controller\ScheduleController::admin'
+    _title: 'Manage Parenting Schedule & Exchange Times'
+  requirements:
+    _permission: 'administer parenting schedule'
+
+parenting_schedule.api:
+  path: '/api/parenting-schedule'
+  methods: [GET]
+  defaults:
+    _controller: '\Drupal\parenting_schedule\Controller\ScheduleController::apiEndpoint'
+  requirements:
+    _permission: 'access parenting schedule'
+
+parenting_schedule.day_save:
+  path: '/admin/config/parenting-schedule/day/save'
+  methods: [POST]
+  defaults:
+    _controller: '\Drupal\parenting_schedule\Controller\ScheduleController::saveDay'
+  requirements:
+    _permission: 'administer parenting schedule'
+
+parenting_schedule.day_delete:
+  path: '/admin/config/parenting-schedule/day/delete'
+  methods: [POST]
+  defaults:
+    _controller: '\Drupal\parenting_schedule\Controller\ScheduleController::deleteDay'
+  requirements:
+    _permission: 'administer parenting schedule'
+
+parenting_schedule.month_add:
+  path: '/admin/config/parenting-schedule/month/add'
+  methods: [POST]
+  defaults:
+    _controller: '\Drupal\parenting_schedule\Controller\ScheduleController::addMonth'
+  requirements:
+    _permission: 'administer parenting schedule'
+
+parenting_schedule.month_delete:
+  path: '/admin/config/parenting-schedule/month/delete'
+  methods: [POST]
+  defaults:
+    _controller: '\Drupal\parenting_schedule\Controller\ScheduleController::deleteMonth'
+  requirements:
+    _permission: 'administer parenting schedule'
+
+parenting_schedule.import:
+  path: '/admin/config/parenting-schedule/import'
+  methods: [POST]
+  defaults:
+    _controller: '\Drupal\parenting_schedule\Controller\ScheduleController::importData'
+  requirements:
+    _permission: 'administer parenting schedule'
+
+parenting_schedule.clear:
+  path: '/admin/config/parenting-schedule/clear'
+  methods: [POST]
+  defaults:
+    _controller: '\Drupal\parenting_schedule\Controller\ScheduleController::clearAll'
+  requirements:
+    _permission: 'administer parenting schedule'

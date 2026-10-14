@@ -1,0 +1,6 @@
+name: 'Parenting Schedule Manager'
+type: module
+description: 'Manages co-parenting shifts, hunting blocks, exchange time overrides, and automated hour calculations.'
+core_version_requirement: ^10 || ^11
+package: Custom
+configure: parenting_schedule.admin
