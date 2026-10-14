@@ -1,0 +1,7 @@
+{
+    "name": "ebremner17/parenting_schedule",
+    "description": "Parenting schedule module for ericbremner.",
+    "type": "drupal-custom-module",
+    "homepage": "https://github.com/ebremner17/parenting_schedule",
+    "keywords": ["Drupal"]
+}
